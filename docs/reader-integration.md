@@ -42,7 +42,7 @@ Missing controls time out after ten seconds. Metadata requests time out after ei
 
 Deterministic browser tests use a real loaded MV3 extension, its worker and storage, plus native Alpine/HTMX versions observed on the site. A sanitized fixture retains the reader control and image-fragment structure; it does not copy chapter pixels, ads, tracking, or the entire site. The popup-as-test-tab substitutes only its active-tab query so it targets the reader as an action popup would.
 
-Public HTML, library source and image-fragment requests succeeded during source inspection. The separate automated live browser smoke check was blocked by Cloudflare before reaching the reader. Therefore, fixture integration passing does not establish that every current live chapter or authenticated/resume flow has passed a real-user check.
+Public HTML, library source and image-fragment requests succeeded during source inspection. The headless automated live browser smoke check was blocked by Cloudflare before reaching the reader. A subsequent visible Chrome session on 2026-10-09 loaded the real reader without a challenge and passed Manga detection, MangaPlus rendering (11 spreads), a trusted Single Page change (21 pages), and saved override restoration after reload. The visible check can be repeated with `npm run test:live -- --headed`; any Cloudflare verification is left to the user. This smoke pass covers the inspected public chapter, not every live chapter or authenticated/bookmark/resume flow.
 
 ## Manual review checklist
 
