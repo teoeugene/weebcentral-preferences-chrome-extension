@@ -31,6 +31,9 @@ async function renderOverrides() {
   byId('sync-warning').textContent = result.warning || '';
   byId('sync-warning').hidden = !result.warning;
   byId('count').textContent = String(result.overrides.length);
+  // Reader status may still be refreshing after a sync event. Read the selection from
+  // authoritative preferences, while keeping any unsaved popup choice intact.
+  if (current && !dirtySeries) byId('series-style').value = result.overrides.find((item) => item.id === current.id)?.style || 'auto';
   byId('overrides').replaceChildren();
   for (const item of result.overrides.sort((a, b) => a.title.localeCompare(b.title))) {
     const li = document.createElement('li');
