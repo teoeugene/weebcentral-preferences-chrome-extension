@@ -76,7 +76,7 @@ GitHub Actions runs deterministic syntax, unit, and browser tests; it does not d
 
 ## Website icon and development identity
 
-The bundled PNG icons are resized copies of [WeebCentral's favicon](https://weebcentral.com/favicon.ico), retrieved on 2026-10-09. They are used in the toolbar and extension management page. The artwork belongs to its original owner; this independent extension is not affiliated with WeebCentral.
+The bundled PNG icons use the anime-face mascot supplied by the user on 2026-10-09, with the surrounding grey background removed. The transparent source is included as `extension/icons/source-mascot.png`; all sizes are rendered from this source instead of enlarging the 32-pixel favicon. They are used in the toolbar and extension management page. The artwork belongs to its original owner; this independent extension is not affiliated with WeebCentral.
 
 The fixed development identity was derived from the original unpacked folder identity and verified before and after adding the manifest key. Chromium currently generates an unpacked ID by hashing decoded manifest-key bytes (or the folder path when no key exists). This development identity seed preserves the existing installation; it is not a CRX signing key. The behavior is verified against [Chromium's ID implementation](https://github.com/chromium/chromium/blob/main/components/crx_file/id_util.cc) and [manifest key parsing](https://github.com/chromium/chromium/blob/main/extensions/common/extension.cc). A future Chrome Web Store/signed release should use its dashboard public key and plan a preference migration if its ID differs.
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "WeebCentral Preferences",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Reading-style defaults by series type, with remembered per-series overrides.",
   "permissions": [
     "storage"
