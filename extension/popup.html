@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WeebCentral Preferences</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="core.js" defer></script>
+  <script src="popup.js" defer></script>
+</head>
+<body>
+  <header><p class="eyebrow">WEEBCENTRAL</p><h1>Your reading styles</h1>
+    <p class="muted">A default for each type. A choice for each series.</p></header>
+  <main>
+    <label class="toggle"><input id="enabled" type="checkbox" disabled> Apply reading styles automatically</label>
+    <section aria-labelledby="defaults-title">
+      <h2 id="defaults-title">Defaults</h2>
+      <label class="row">Manga <select id="Manga" disabled></select></label>
+      <label class="row">Manhwa <select id="Manhwa" disabled></select></label>
+      <label class="row">Manhua <select id="Manhua" disabled></select></label>
+      <button id="save-defaults" type="button" disabled>Save defaults</button>
+    </section>
+    <section aria-labelledby="series-title">
+      <h2 id="series-title">Current series</h2>
+      <p id="current-title">Open a WeebCentral series or chapter.</p>
+      <p id="current-detail" class="muted"></p>
+      <label class="row">Reading style <select id="series-style" disabled></select></label>
+      <button id="save-series" type="button" disabled>Save series preference</button>
+      <p class="hint">Changing Reading Style in the reader also saves an override. Choose “Use type default” to remove it.</p>
+    </section>
+    <details><summary>Saved series overrides <span id="count">0</span></summary><ul id="overrides"></ul></details>
+    <p id="sync-warning" role="status" aria-live="polite" hidden></p>
+    <p id="feedback" role="status" aria-live="polite"></p>
+  </main>
+  <footer>Uses Chrome Sync with your signed-in Chrome profile.</footer>
+</body>
+</html>

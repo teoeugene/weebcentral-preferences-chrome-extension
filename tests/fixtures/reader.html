@@ -1,0 +1,13 @@
+<!-- Minimal sanitized structure observed on the live Blue Box chapter on 2026-10-09.
+     Native Alpine/HTMX behavior is exercised separately in the browser tests. -->
+<main x-data="singlePageNavigation">
+  <a href="https://weebcentral.com/series/01J76XYEMXXHG63FKC2DMTNC7B/Blue-Box">Blue Box</a>
+  <input type="hidden" name="reading_style" value="long_strip" x-model="reading_style">
+  <section id="chapter-images" hx-get="/chapters/example/images" hx-trigger="change from:[name='reading_style']" hx-include="[name='reading_style'],[name='current_page']" hx-swap="outerHTML"></section>
+  <dialog id="preference_modal">
+    <label><input type="radio" value="long_strip" x-model="reading_style" checked>Long Strip</label>
+    <label><input type="radio" value="single_page" x-model="reading_style">Single Page</label>
+    <label><input type="radio" value="double_page" x-model="reading_style">Double Page</label>
+    <label><input type="radio" value="double_page_v2" x-model="reading_style">Double Page (MangaPlus)</label>
+  </dialog>
+</main>
