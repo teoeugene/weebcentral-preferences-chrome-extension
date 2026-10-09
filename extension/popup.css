@@ -22,5 +22,6 @@ summary { cursor: pointer; }
 ul { display: grid; gap: 10px; padding: 0; list-style: none; }
 li { padding: 10px; border: 1px solid #30394c; border-radius: 8px; }
 li button { margin-top: 6px; }
+#sync-warning { font-size: 12px; color: #f7c76e; }
 #feedback { min-height: 20px; margin: 0; color: #f7c76e; }
 footer { padding: 12px 22px 18px; font-size: 11px; color: #b5bed0; }

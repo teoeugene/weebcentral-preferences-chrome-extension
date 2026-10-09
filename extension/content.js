@@ -65,7 +65,7 @@
       .then(schedule).catch((error) => { status.state = 'error'; status.detail = error.message; });
   });
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && (changes.settings || (current && changes[WC.seriesKey(current.id)]))) {
+    if (area === 'sync' && (changes.settings || (current && changes[WC.seriesKey(current.id)]))) {
       // Cancel an in-flight apply before scheduling the replacement.
       generation++;
       schedule();

@@ -60,7 +60,7 @@ async function openReader(id = manga) {
   await page.goto(`https://weebcentral.com/chapters/fixture?series=${id}`);
   return page;
 }
-async function storage() { return worker.evaluate(() => chrome.storage.local.get(null)); }
+async function storage() { return worker.evaluate(async () => ({ ...await chrome.storage.local.get(null), ...await chrome.storage.sync.get(null) })); }
 async function openPopup(page) {
   const tabId = await worker.evaluate(async () => (await chrome.tabs.query({})).find((tab) => tab.url?.includes('/chapters/')).id);
   const popup = await context.newPage();
@@ -146,4 +146,65 @@ test('a manual choice during slow metadata detection wins over auto apply', asyn
   release();
   await expect.poll(async () => (await storage())[`type:${manga}`]?.type).toBe('Manga');
   await expect(page.locator('#chapter-images')).toHaveAttribute('data-rendered-style', 'single_page');
+});
+
+test('sync changes from another device update an open reader; metadata stays local', async () => {
+  const page = await openReader();
+  await expect(page.locator('#chapter-images')).toHaveAttribute('data-rendered-style', 'double_page_v2');
+  await worker.evaluate(async (id) => {
+    await chrome.storage.sync.set({ [`series:${id}`]: { style: 'single_page', title: 'From another PC' } });
+  }, manga);
+  await expect(page.locator('#chapter-images')).toHaveAttribute('data-rendered-style', 'single_page');
+  await worker.evaluate((id) => chrome.storage.sync.remove(`series:${id}`), manga);
+  await expect(page.locator('#chapter-images')).toHaveAttribute('data-rendered-style', 'double_page_v2');
+  const synced = await worker.evaluate(() => chrome.storage.sync.get(null));
+  expect(Object.keys(synced).some((key) => key.startsWith('type:'))).toBe(false);
+  const local = await worker.evaluate(() => chrome.storage.local.get(null));
+  expect(local[`type:${manga}`].type).toBe('Manga');
+});
+
+test('older local preferences migrate automatically when the popup first opens', async () => {
+  await worker.evaluate(async (id) => {
+    await chrome.storage.local.set({ settings: { enabled: false }, [`series:${id}`]: { style: 'single_page', title: 'Old series' } });
+    await chrome.storage.local.remove('syncMigrationV1');
+  }, manga);
+  const page = await openReader();
+  const popup = await openPopup(page);
+  await expect(popup.locator('#enabled')).not.toBeChecked();
+  await expect(popup.locator('#count')).toHaveText('1');
+  const synced = await worker.evaluate(() => chrome.storage.sync.get(null));
+  expect(synced.settings.enabled).toBe(false);
+  expect(synced[`series:${manga}`].style).toBe('single_page');
+});
+
+test('fixed manifest identity matches the previous D-folder ID and loads bundled site icons', async () => {
+  expect(extensionId).toBe('ananlhfpdnnpffigcopbnnplpadbhgpn');
+  const popup = await context.newPage();
+  await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+  const dimensions = await popup.evaluate(async () => {
+    const manifest = chrome.runtime.getManifest();
+    return Promise.all(Object.entries(manifest.icons).map(([size, file]) => new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve([Number(size), image.naturalWidth, image.naturalHeight]);
+      image.onerror = () => reject(new Error(`Missing icon: ${file}`));
+      image.src = chrome.runtime.getURL(file);
+    })));
+  });
+  expect(dimensions).toEqual([[16, 16, 16], [32, 32, 32], [48, 48, 48], [128, 128, 128]]);
+});
+
+test('incoming sync updates the popup while keeping an unsaved default selection', async () => {
+  const page = await openReader();
+  await expect(page.locator('#chapter-images')).toHaveAttribute('data-rendered-style', 'double_page_v2');
+  const popup = await openPopup(page);
+  await popup.locator('#Manhua').selectOption('single_page');
+  await worker.evaluate(() => chrome.storage.sync.set({ settings: {
+    enabled: true, defaults: { Manga: 'single_page', Manhwa: 'double_page', Manhua: 'double_page' },
+  } }));
+  await expect(popup.locator('#Manga')).toHaveValue('single_page');
+  await expect(popup.locator('#Manhwa')).toHaveValue('double_page');
+  await expect(popup.locator('#Manhua')).toHaveValue('single_page');
+  await worker.evaluate((id) => chrome.storage.sync.set({ [`series:${id}`]: { style: 'double_page', title: 'Remote series' } }), manga);
+  await expect(popup.locator('#count')).toHaveText('1');
+  await expect(popup.locator('#series-style')).toHaveValue('double_page');
 });

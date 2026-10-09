@@ -34,9 +34,17 @@ Only Reading Style is managed. Reading Direction, Image Fit, gaps, bookmarks, an
 
 ## Data and permissions
 
-Preferences and series overrides are stored in `chrome.storage.local`, on this device; they do not sync between devices. A successful series-type lookup is cached for seven days (up to 200 series). Saved overrides work without a metadata network request, including offline when the reader page is otherwise available.
+Defaults, the enabled/paused state, and series overrides use `chrome.storage.sync`. Install this same version on each PC, sign in to Chrome with the same Google account, and enable Chrome Sync. Preferences then follow that profile; copying the files does not install the extension automatically on another device. Chrome keeps changes locally while offline and resumes synchronization later. Open readers and popups respond to incoming sync changes.
 
-Permissions are limited to `storage` and HTTPS access to `weebcentral.com` and `www.weebcentral.com`. Site access lets the content script operate on reader/series pages and the worker fetch public series metadata. Metadata fetches omit credentials. The extension has no analytics, account access, external messaging, or remote extension code. Uninstalling it removes its Chrome storage; WeebCentral's own persisted settings are separate.
+Existing v0.1 local preferences migrate automatically on first use. Existing synced values take precedence over older local values. A local recovery copy remains but is ignored after migration succeeds, so deleted overrides are not restored by later updates. If migration cannot fit into Chrome Sync, the popup shows a warning and older local preferences remain usable; remove saved overrides until migration can complete.
+
+A successful series-type lookup remains in local storage for seven days (up to 200 series). This disposable metadata cache is never synced. Saved overrides work without a metadata request, including offline when the reader page is otherwise available.
+
+[Chrome Sync](https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync) currently permits 100 KB in total, 8 KB per item, 512 items, and limited write rates. Each series has its own small key, so changing one series cannot replace the entire series collection. Identical saves skip redundant writes. Capacity or rate-limit failures are reported; a failed new save never silently deletes an older preference. Simultaneous edits of the same default or series follow Chrome Sync's conflict handling.
+
+The manifest fixes the extension ID to **ananlhfpdnnpffigcopbnnplpadbhgpn** so different folders/operating systems share one sync namespace. This also preserves the pre-sync ID of your original `D:\Projects\Eugene\weebcentral-preferences-chrome-extension\extension` installation. Keep the bundled manifest key unchanged. Older installations loaded from a different folder had a different ID; keep those installed until their preferences are copied into the updated extension. See the development identity note below.
+
+Permissions are limited to `storage` and HTTPS access to `weebcentral.com` and `www.weebcentral.com`. Site access lets the content script operate on reader/series pages and the worker fetch public series metadata. Metadata fetches omit credentials. The extension has no analytics, Google account API access, external messaging, or remote extension code. Chrome Sync itself uses your Chrome account and sync settings. Uninstalling removes device-local data; do not use uninstall/reinstall as a way to preserve settings. WeebCentral's own persisted settings are separate.
 
 ## Development and tests
 
@@ -66,4 +74,10 @@ GitHub Actions runs deterministic syntax, unit, and browser tests; it does not d
 - `tests/`: unit tests, sanitized markup fixture and extension browser integration tests.
 - [Reader implementation notes](docs/reader-integration.md): inspected source, compatibility boundaries and manual checks.
 
-This extension is independent of WeebCentral and is not a Chrome Web Store release.
+## Website icon and development identity
+
+The bundled PNG icons are resized copies of [WeebCentral's favicon](https://weebcentral.com/favicon.ico), retrieved on 2026-10-09. They are used in the toolbar and extension management page. The artwork belongs to its original owner; this independent extension is not affiliated with WeebCentral.
+
+The fixed development identity was derived from the original unpacked folder identity and verified before and after adding the manifest key. Chromium currently generates an unpacked ID by hashing decoded manifest-key bytes (or the folder path when no key exists). This development identity seed preserves the existing installation; it is not a CRX signing key. The behavior is verified against [Chromium's ID implementation](https://github.com/chromium/chromium/blob/main/components/crx_file/id_util.cc) and [manifest key parsing](https://github.com/chromium/chromium/blob/main/extensions/common/extension.cc). A future Chrome Web Store/signed release should use its dashboard public key and plan a preference migration if its ID differs.
+
+This is an unpacked development extension, not a Chrome Web Store release.

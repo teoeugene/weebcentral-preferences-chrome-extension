@@ -59,7 +59,7 @@ const seriesId = '01J76XYEMXXHG63FKC2DMTNC7B';
     await page.locator('#preference_modal').evaluate((modal) => modal.showModal());
     await page.locator('input[type="radio"][value="single_page"]').check();
     await page.waitForFunction(() => Number(document.getElementById('max_page')?.value) === 21);
-    const saved = await worker.evaluate(async (id) => (await chrome.storage.local.get(`series:${id}`))[`series:${id}`], seriesId);
+    const saved = await worker.evaluate(async (id) => (await chrome.storage.sync.get(`series:${id}`))[`series:${id}`], seriesId);
     assert.equal(saved.style, 'single_page');
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => document.querySelector('input[type="radio"][value="single_page"]')?.checked && Number(document.getElementById('max_page')?.value) === 21);

@@ -10,4 +10,9 @@ for (const file of ['background.js', 'popup.html', ...manifest.content_scripts.f
 for (const file of fs.readdirSync(path.join(root, 'extension')).filter((file) => file.endsWith('.js'))) {
   execFileSync(process.execPath, ['--check', path.join(root, 'extension', file)]);
 }
-console.log('Manifest references and extension JavaScript syntax pass.');
+for (const [size, file] of Object.entries(manifest.icons || {})) {
+  const image = fs.readFileSync(path.join(root, 'extension', file));
+  if (image.readUInt32BE(16) !== Number(size) || image.readUInt32BE(20) !== Number(size)) throw new Error('Wrong icon dimensions: ' + file);
+}
+if (manifest.version !== JSON.parse(fs.readFileSync(path.join(root, 'package.json'))).version) throw new Error('Package and manifest versions differ.');
+console.log('Manifest references, icon dimensions, version and extension JavaScript syntax pass.');

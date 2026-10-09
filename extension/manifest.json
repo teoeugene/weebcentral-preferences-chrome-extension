@@ -1,18 +1,49 @@
 {
   "manifest_version": 3,
   "name": "WeebCentral Preferences",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Reading-style defaults by series type, with remembered per-series overrides.",
-  "permissions": ["storage"],
-  "host_permissions": ["https://weebcentral.com/*", "https://www.weebcentral.com/*"],
-  "background": { "service_worker": "background.js" },
-  "action": { "default_title": "WeebCentral Preferences", "default_popup": "popup.html" },
-  "content_scripts": [{
-    "matches": [
-      "https://weebcentral.com/chapters/*", "https://weebcentral.com/series/*",
-      "https://www.weebcentral.com/chapters/*", "https://www.weebcentral.com/series/*"
-    ],
-    "js": ["core.js", "reader-dom.js", "content.js"],
-    "run_at": "document_idle"
-  }]
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://weebcentral.com/*",
+    "https://www.weebcentral.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "WeebCentral Preferences",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://weebcentral.com/chapters/*",
+        "https://weebcentral.com/series/*",
+        "https://www.weebcentral.com/chapters/*",
+        "https://www.weebcentral.com/series/*"
+      ],
+      "js": [
+        "core.js",
+        "reader-dom.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "key": "RAA6AFwAUAByAG8AagBlAGMAdABzAFwARQB1AGcAZQBuAGUAXAB3AGUAZQBiAGMAZQBuAHQAcgBhAGwALQBwAHIAZQBmAGUAcgBlAG4AYwBlAHMALQBjAGgAcgBvAG0AZQAtAGUAeAB0AGUAbgBzAGkAbwBuAFwAZQB4AHQAZQBuAHMAaQBvAG4A",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
 }

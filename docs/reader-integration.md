@@ -34,7 +34,7 @@ The series page's explicit Type field links to `/search?included_type=Manga` (or
 
 The isolated content script waits for all four known native controls and an initialized, settled HTMX image fragment, then selects the desired radio and dispatches a normal `change` event. Alpine updates its model and HTMX reloads the native layout. A hidden-input fallback handles radios without Alpine's native trigger name. No page-world bridge, guessed persistence keys, injected scripts, replacement images, or custom spread renderer are needed.
 
-Only trusted user radio changes are saved as overrides. Extension-generated events cannot create accidental overrides. Pending auto-apply is cancelled when the user makes a choice or settings change. Generation checks ignore stale metadata responses. The worker serializes writes and stores overrides under separate `series:<ID>` keys so simultaneous series writes do not clobber one another. Known overrides and paused automation bypass metadata fetches.
+Only trusted user radio changes are saved as overrides. Extension-generated events cannot create accidental overrides. Pending auto-apply is cancelled when the user makes a choice or settings change. Generation checks ignore stale metadata responses. The worker serializes writes on each device and stores defaults and separate `series:<ID>` keys in Chrome Sync so changing one series does not replace other series. Incoming sync events refresh readers and popups. The metadata cache and migration recovery copy stay local. Older local preferences migrate without overwriting existing sync values; failed migration retains usable local data and shows a warning. Known overrides and paused automation bypass metadata fetches.
 
 Missing controls time out after ten seconds. Metadata requests time out after eight seconds. Unknown types are not guessed; explicit overrides remain available. Requests that fail or produce unrecognized metadata are not cached. Successful type metadata is cached for seven days, with bounded pruning that never deletes preferences.
 
@@ -54,5 +54,9 @@ Public HTML, library source and image-fragment requests succeeded during source 
 6. Remove Blue Box's override: confirm the Manga default returns. Pause automation, make a native choice and confirm no new override is saved. Re-enable it.
 7. Check an unsupported type or metadata failure: confirm the reader remains usable and an explicit override works.
 8. Check a bookmark/deep-link resume and `is_prev` chapter navigation: the site owns current-page/spread semantics and may clamp resumed pages when switching layouts.
+
+9. Install the same bundle on a second PC with the same signed-in Chrome profile and Chrome Sync enabled. Confirm a changed default/override arrives there and removal returns the type default. Sync transport can take time; no Google account was used by automated tests.
+
+Automated sync tests use the real Chrome storage.sync API and inject incoming changes to verify reader/popup behavior. Unit tests cover migration, recovery after capacity failures, write throttling, unchanged-write suppression and non-resurrection after deletion. Tests verify the ID and icon dimensions; GitHub's Linux run also checks the same fixed ID outside the original Windows folder.
 
 If site selectors, model names, HTMX triggers, or supported native values change, update the adapter and fixtures after inspecting the new live source.
